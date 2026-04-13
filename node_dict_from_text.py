@@ -10,7 +10,7 @@ from frozendict import frozendict as _frozendict, deepfreeze as _deepfreeze
 
 from comfy.comfy_types.node_typing import IO as _IO
 
-from . import _meta
+from .__meta import category
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
 from .funcs_common import _show_text_on_node, _new_updated_dict, _T
@@ -94,7 +94,7 @@ class StringConstructorDictFromText:
 	Build a dict of named sub-strings to be used later in string formatting (text construction).
 	"""
 	NODE_NAME = 'StringConstructorDictFromText'
-	CATEGORY = _meta.category
+	CATEGORY = category
 	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
 
 	OUTPUT_NODE = True  # Just to show the status message even if not connected to anything

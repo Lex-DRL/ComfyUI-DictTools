@@ -8,7 +8,7 @@ from inspect import cleandoc as _cleandoc
 
 from frozendict import deepfreeze as _deepfreeze
 
-from . import _meta
+from .__meta import category_dict
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
 from .funcs_common import _verify_input_dict, _show_text_on_node, _T
@@ -31,7 +31,7 @@ class StringConstructorValidateKeys:
 	but it might be handy to verify the dict right after it's created.
 	"""
 	NODE_NAME = 'StringConstructorValidateKeys'
-	CATEGORY = _meta.category_dict
+	CATEGORY = category_dict
 	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
 
 	OUTPUT_NODE = True

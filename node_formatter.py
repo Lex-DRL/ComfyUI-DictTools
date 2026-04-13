@@ -14,7 +14,7 @@ from frozendict import deepfreeze as _deepfreeze
 
 from comfy.comfy_types.node_typing import IO as _IO
 
-from . import _meta
+from .__meta import category
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
 from .funcs_common import _show_text_on_node, _verify_input_dict
@@ -221,7 +221,7 @@ class StringConstructorFormatter:
 	Construct the formatted string from template and format-dictionary.
 	"""
 	NODE_NAME = 'StringConstructorFormatter'
-	CATEGORY = _meta.category
+	CATEGORY = category
 	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
 
 	OUTPUT_NODE = True

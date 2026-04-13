@@ -9,7 +9,7 @@ from pprint import pformat as _pformat
 
 from frozendict import deepfreeze as _deepfreeze, frozendict as _frozendict
 
-from . import _meta
+from .__meta import category_dict
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
 from .funcs_common import _show_text_on_node, _verify_input_dict_into_new
@@ -69,7 +69,7 @@ class StringConstructorDictPreview:
 	Show the contents of a Format-Dict.
 	"""
 	NODE_NAME = 'StringConstructorDictPreview'
-	CATEGORY = _meta.category_dict
+	CATEGORY = category_dict
 	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
 
 	OUTPUT_NODE = True

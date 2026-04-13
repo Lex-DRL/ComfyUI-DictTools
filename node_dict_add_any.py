@@ -10,7 +10,7 @@ from frozendict import deepfreeze as _deepfreeze
 
 from comfy.comfy_types.node_typing import IO as _IO
 
-from . import _meta
+from .__meta import category_dict
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
 from .funcs_common import _new_dict_with_updated_key
@@ -40,7 +40,7 @@ _input_types = _deepfreeze({
 class StringConstructorDictAddAny:
 	"""Add/update a non-string item to the Format-Dict - to do some advanced formatting."""
 	NODE_NAME = 'StringConstructorDictAddAny'
-	CATEGORY = _meta.category_dict
+	CATEGORY = category_dict
 	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
 
 	FUNCTION = 'main'
