@@ -11,7 +11,7 @@ from frozendict import deepfreeze as _deepfreeze, frozendict as _frozendict
 
 from server import PromptServer as _PromptServer
 
-from .enums import T as _T, T2 as _T2
+from .__typing import T as _T, T2 as _T2
 
 
 def _show_text_on_node(text: str = None, unique_id: str = None):

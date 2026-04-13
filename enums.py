@@ -10,9 +10,7 @@ try:
 except ImportError:
 	from comfy.comfy_types.node_typing import StrEnum as _StrEnum
 
-
-T = _t.TypeVar('T')
-T2 = _t.TypeVar('T2')
+from .__typing import T as _T
 
 
 class __BaseEnum(_StrEnum):
@@ -26,7 +24,7 @@ class DataTypes(__BaseEnum):
 	DICT = 'DICT'
 
 	@staticmethod
-	def __custom_input_type_dict(_dict_args: _t.Tuple[_t.Dict[str, T], ...], kwargs: _t.Dict[str, T]) -> _t.Dict[str, T]:
+	def __custom_input_type_dict(_dict_args: _t.Tuple[_t.Dict[str, _T], ...], kwargs: _t.Dict[str, _T]) -> _t.Dict[str, _T]:
 		res_dict: _t.Dict[str, _t.Any] = {"forceInput": True}
 		for d in _dict_args:
 			if d is not None:
@@ -35,5 +33,5 @@ class DataTypes(__BaseEnum):
 		return res_dict
 
 	@classmethod
-	def input_dict(cls, *_dicts: _t.Dict[str, T], **kwargs: T) -> _t.Tuple[_t.Union['DataTypes', str], _t.Dict[str, T]]:
+	def input_dict(cls, *_dicts: _t.Dict[str, _T], **kwargs: _T) -> _t.Tuple[_t.Union['DataTypes', str], _t.Dict[str, _T]]:
 		return str(cls.DICT), cls.__custom_input_type_dict(_dicts, kwargs)
