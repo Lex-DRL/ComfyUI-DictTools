@@ -14,7 +14,7 @@ from .__meta import category
 from ._dict import _show_text_on_node, _new_updated_dict, _T
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .node_dict_add_string import _input_types as _input_types_str
+from .old_dict_add_string import _input_types as _input_types_str
 
 
 def _return_line_raw(line_raw: str, line_stripped:str) -> str:

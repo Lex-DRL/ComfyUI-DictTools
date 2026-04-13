@@ -4,13 +4,13 @@
 
 import typing as _t
 
-from .node_dict_add_any import StringConstructorDictAddAny
-from .node_dict_add_string import StringConstructorDictAddString
-from .node_dict_key_extract import StringConstructorDictExtractString
-from .node_dict_from_text import StringConstructorDictFromText
-from .node_dict_preview import StringConstructorDictPreview
-from .node_formatter import StringConstructorFormatter
-from .node_validate_keys import StringConstructorValidateKeys
+from .old_dict_add_any import StringConstructorDictAddAny
+from .old_dict_add_string import StringConstructorDictAddString
+from .old_dict_key_extract import StringConstructorDictExtractString
+from .old_dict_from_text import StringConstructorDictFromText
+from .old_dict_preview import StringConstructorDictPreview
+from .old_formatter import StringConstructorFormatter
+from .old_validate_keys import StringConstructorValidateKeys
 
 NODE_CLASS_MAPPINGS: _t.Dict[str, type] = {
 	'StringConstructorDictAddAny': StringConstructorDictAddAny,
