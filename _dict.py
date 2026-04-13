@@ -1,6 +1,6 @@
 # encoding: utf-8
 """
-Code shared between various `funcs_*` modules.
+Shared code to deal with dicts.
 """
 
 import typing as _t

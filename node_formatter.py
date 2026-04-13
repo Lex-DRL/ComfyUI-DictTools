@@ -15,9 +15,9 @@ from frozendict import deepfreeze as _deepfreeze
 from comfy.comfy_types.node_typing import IO as _IO
 
 from .__meta import category
+from ._dict import _show_text_on_node, _verify_input_dict
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .funcs_common import _show_text_on_node, _verify_input_dict
 
 
 _RECURSION_LIMIT = max(int(_sys.getrecursionlimit()), 1)  # You can externally monkey-patch it... but if it blows up, your fault 🤷🏻‍♂️single

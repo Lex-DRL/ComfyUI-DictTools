@@ -10,9 +10,9 @@ from pprint import pformat as _pformat
 from frozendict import deepfreeze as _deepfreeze, frozendict as _frozendict
 
 from .__meta import category_dict
+from ._dict import _show_text_on_node, _verify_input_dict_into_new
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .funcs_common import _show_text_on_node, _verify_input_dict_into_new
 
 
 def _to_regular_dict_recursive_copy(input_dict: dict = None) -> dict:

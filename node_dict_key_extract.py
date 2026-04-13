@@ -11,9 +11,9 @@ from frozendict import deepfreeze as _deepfreeze
 from comfy.comfy_types.node_typing import IO as _IO
 
 from .__meta import category_dict
+from ._dict import _show_text_on_node, _new_dict_with_updated_key, _T
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .funcs_common import _show_text_on_node, _new_dict_with_updated_key, _T
 
 
 _input_types = _deepfreeze({

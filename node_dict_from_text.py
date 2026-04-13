@@ -11,9 +11,9 @@ from frozendict import frozendict as _frozendict, deepfreeze as _deepfreeze
 from comfy.comfy_types.node_typing import IO as _IO
 
 from .__meta import category
+from ._dict import _show_text_on_node, _new_updated_dict, _T
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .funcs_common import _show_text_on_node, _new_updated_dict, _T
 from .node_dict_add_string import _input_types as _input_types_str
 
 

@@ -9,9 +9,9 @@ from inspect import cleandoc as _cleandoc
 from frozendict import deepfreeze as _deepfreeze
 
 from .__meta import category_dict
+from ._dict import _verify_input_dict, _show_text_on_node, _T
 from .docstring_formatter import format_docstring as _format_docstring
 from .enums import DataTypes as _DataTypes
-from .funcs_common import _verify_input_dict, _show_text_on_node, _T
 
 
 _input_types = _deepfreeze({
