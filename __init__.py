@@ -4,6 +4,7 @@
 
 import typing as _t
 
+from ._formatter_class import Formatter
 from .old_dict_add_any import StringConstructorDictAddAny
 from .old_dict_add_string import StringConstructorDictAddString
 from .old_dict_key_extract import StringConstructorDictExtractString
