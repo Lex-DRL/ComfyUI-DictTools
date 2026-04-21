@@ -12,7 +12,7 @@ from .__meta import (
 	pack_id_suffix as _pack_id
 )
 from .__typing import _A, _U, _O, _t, T as _T, FormatDict as _FormatDict
-from ._dict import _new_dict_with_updated_key
+from ._dict_funcs import _new_dict_with_updated_key
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT,
