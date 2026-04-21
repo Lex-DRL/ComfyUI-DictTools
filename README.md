@@ -19,13 +19,17 @@
   - ... and even have multiple versions of them for different stages of workflow - as long as each value has its own unique key.
 - Even though ComfyUI actively uses dicts under the hood, there's no built-in `DICT` data type exposed to users, nor there are any nodes to build/modify/use dicts.
 - This node pack aims to fix that.
-- I **highly** recommend using it together with my [String Constructor/Formatter](https://github.com/Lex-DRL/ComfyUI-StringConstructor) node and with [Basic Data Handling](https://github.com/StableLlama/ComfyUI-basic_data_handling) pack.
+
+> [!IMPORTANT]
+> I **highly** recommend using it together with:
+> - [Basic Data Handling](https://github.com/StableLlama/ComfyUI-basic_data_handling) pack. It exposes all the built-in python methods to work with dicts as ComfyUI nodes.
+> - My other [String Constructor/Formatter](https://github.com/Lex-DRL/ComfyUI-StringConstructor) node. I will **NOT** pile up all my nodes into another one uber-mega "Comfy-Darlog-Tools" pack. Install only what wou need, separately.
 
 ## What for?
 
 In short:
 - Advanced text formatting;
-- Utilizing the well-known "bus" workflow to reduce spaghetti, while letting **you** decide what data is contained inside the bus - not the node author deciding for you;
+- Utilizing the well-known "bus" workflow to reduce spaghetti, while letting **you** decide what categories of data are contained inside the bus - not the node author deciding for you;
 - Any other uses for dicts - your choice!
 
 Now, specifics.
