@@ -1,21 +1,26 @@
 # encoding: utf-8
-"""
-"""
-
-import typing as _t
+"""Code for the ``Dict from Text`` node."""
 
 from inspect import cleandoc as _cleandoc
 
-from frozendict import frozendict as _frozendict, deepfreeze as _deepfreeze
+from comfy_api.latest import io as _io, ui as _ui
 
-from comfy.comfy_types.node_typing import IO as _IO
-
-from . import _meta
+from .__meta import (
+	category as _category,
+	pack_id_suffix as _pack_id
+)
+from .__typing import _A, _U, _O, _t, T as _T, FormatDict as _FormatDict
+from ._dict_funcs import _new_updated_dict
+from ._io_custom import (
+	_BaseNode,
+	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT,
+	_input_override, _schema_old_name
+)
 from .docstring_formatter import format_docstring as _format_docstring
-from .enums import DataTypes as _DataTypes
-from .funcs_common import _show_text_on_node, _new_updated_dict, _T
-from .node_dict_add_string import _input_types as _input_types_str
 
+_dict = dict
+
+# ----------------------------------------------------------
 
 def _return_line_raw(line_raw: str, line_stripped:str) -> str:
 	return line_raw
@@ -26,7 +31,7 @@ def _return_line_stripped(line_raw: str, line_stripped:str) -> str:
 
 
 def _parsed_kv_pairs_gen(multiline_str: str, strip_lines=True):
-	"""
+	"""Parse the "dict text" into sequence of key-value pairs:
 	Given a multiline string, extract keywords (first non-empty line in each chunk)
 	and their substrings (all the following non-empty lines).
 	"""
@@ -62,68 +67,93 @@ def _parsed_kv_pairs_gen(multiline_str: str, strip_lines=True):
 	if cur_chunk:
 		yield dump_chunk()
 
-# --------------------------------------
+# ----------------------------------------------------------
 
-_dict = dict
-
-_input_types = _deepfreeze({
-	'required': {
-		'cleanup': (_IO.BOOLEAN, {'default': True, 'label_on': 'leading/trailing spaces', 'label_off': 'no', 'tooltip': (
-			"When enabled, each line in each sub-string is stripped from any spaces at its start and end."
-		)}),
-		'strings': (_IO.STRING, {'multiline': True, 'tooltip': (
-			"Sub-string names followed by their text. Different sub-string chunks are separated by empty lines. Example:\n\n"
-			"char1_short\n1boy, blond, short hair\n\n"
-			"char1_long\n1boy, smiling, blue eyes, blond, short hair,\nwearing a leather jacket, sitting on a bike"
-		)}),
-		'show_status': (_IO.BOOLEAN, {'default': False, 'label_on': 'detected names', 'label_off': 'no', 'tooltip': (
-			"Show detected string names on the node itself?"
-		)}),
-	},
-	'optional': {
-		'dict': _input_types_str['optional']['dict'],
-	},
-	'hidden': {
-		'unique_id': 'UNIQUE_ID',  # used for text display at the bottom of the node
-	},
-})
-
-
-class StringConstructorDictFromText:
+class DictFromText(_BaseNode):
 	"""
 	Build a dict of named sub-strings to be used later in string formatting (text construction).
 	"""
-	NODE_NAME = 'StringConstructorDictFromText'
-	CATEGORY = _meta.category
-	DESCRIPTION = _format_docstring(_cleandoc(__doc__))
+	_schema = _io.Schema(
+		node_id=f'DictFromText{_pack_id}',
+		display_name='Dict from Text',
+		category=_category,
+		description=_format_docstring(_cleandoc(__doc__)),
+		inputs=[
+			_io.Boolean.Input(
+				'cleanup',
+				tooltip="When enabled, each line in each sub-string is stripped from any spaces at its start and end.",
+				default=True,
+				label_on='leading/trailing spaces',
+				label_off='no',
+			),
+			_io.String.Input(
+				'dict_text', display_name='dict-items text',
+				tooltip=(
+					"Sub-string names followed by their text. Different sub-string chunks are separated by empty lines. Example:\n\n"
+					"char1_short\n1boy, blond, short hair\n\n"
+					"char1_long\n1boy, smiling, blue eyes, blond, short hair,\nwearing a leather jacket, sitting on a bike"
+				),
+				multiline=True,
+			),
+			_io.Boolean.Input(
+				'show_status',
+				tooltip="Show detected string names on the node itself?",
+				default=False,
+				label_on='detected keys',
+				label_off='no',
+			),
 
-	OUTPUT_NODE = True  # Just to show the status message even if not connected to anything
-
-	FUNCTION = 'main'
-	RETURN_TYPES = (str(_DataTypes.DICT), )
-	RETURN_NAMES = (_DataTypes.DICT.lower(), )
-	# OUTPUT_TOOLTIPS = tuple()
+			_DICT_INPUT_OPTIONAL,
+		],
+		outputs=[_DICT_OUTPUT],
+		# hidden=[_io.Hidden.unique_id],
+		is_output_node=True,  # Just to show the status message even if not connected to anything
+	)
 
 	@classmethod
-	def INPUT_TYPES(cls):
-		return _input_types
-
-	@staticmethod
-	def main(
-		cleanup: bool, strings: str, show_status: bool = True,
-		dict: _t.Dict[str, _T] = None, unique_id: str = None,
-	) -> _t.Tuple[_t.Dict[str, _t.Union[_T, str]]]:
-		new_dict = {k: v for k, v in _parsed_kv_pairs_gen(strings, strip_lines=cleanup)}
+	def execute(cls,
+		cleanup: bool, dict_text: str, show_status: bool = False,
+		dict: _O[_FormatDict] = None
+	) -> _io.NodeOutput:
+		parsed_items = _parsed_kv_pairs_gen(dict_text, strip_lines=cleanup)
+		new_dict = {k: v for k, v in parsed_items}
 
 		if not new_dict:
-			if dict is None:
-				dict = _dict()
-			return (dict, )  # No need to create another dict instance if we add nothing
+			# No need to create another dict instance if we add nothing:
+			out_dict = _dict() if dict is None else dict
+			out_ui = '' if show_status else None
+			return _io.NodeOutput(out_dict, ui=out_ui)
 
 		out_dict = _new_updated_dict(dict, new_dict)
-		# These two ↑↓ must be in this specific order: `_new_updated_dict()` also checks both dicts
-		if show_status and unique_id:
+		# These two ↑↓ must be in this specific order:
+		# `_new_updated_dict()` also checks both dicts and might throw an error
+		out_ui = None
+		if show_status:
 			status_text = ','.join(new_dict.keys()) if new_dict else ''
-			_show_text_on_node(status_text, unique_id)
+			out_ui = _ui.PreviewText(status_text)
 
-		return (out_dict, )
+		return _io.NodeOutput(out_dict, ui=out_ui)
+
+# ==========================================================
+# Deprecated node with old ID (for backwards compatibility)
+
+class DictFromTextOld1(_BaseNode):
+	# noinspection PyProtectedMember
+	_schema = _schema_old_name(
+		DictFromText._schema,
+		'StringConstructorDictFromText',
+		inputs=[
+			_input_override(x, id='strings') if x.id == 'dict_text' else x
+			for x in DictFromText._schema.inputs
+		],
+	)
+
+	@classmethod
+	def execute(cls,
+		cleanup: bool, strings: str, show_status: bool = False,
+		dict: _O[_FormatDict] = None
+	) -> _io.NodeOutput:
+		return DictFromText.execute(
+			cleanup=cleanup, dict_text=strings, show_status=show_status,
+			dict=dict
+		)
