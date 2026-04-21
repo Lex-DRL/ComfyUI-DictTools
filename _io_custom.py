@@ -14,7 +14,7 @@ _DICT = _io.Custom("DICT")
 _DICT_INPUT_OPTIONAL = _DICT.Input(
 	'dict',
 	optional=True,
-	tooltip="An (optional) Format-Dictionary to work with."
+	tooltip="An (optional) Dictionary to work with."
 )
 _DICT_OUTPUT = _DICT.Output(
 	'DICT',

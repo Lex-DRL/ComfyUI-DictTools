@@ -1,5 +1,5 @@
 # encoding: utf-8
-"""Service nodes for dict preparation."""
+"""The main module for simple dict nodes."""
 
 from inspect import cleandoc as _cleandoc
 
@@ -8,7 +8,7 @@ from frozendict import frozendict as _frozendict
 from comfy_api.latest import io as _io, ui as _ui
 
 from .__meta import (
-	category_dict as _category_dict,
+	category as _category,
 	pack_id_suffix as _pack_id
 )
 from .__typing import _A, _U, _O, _t, T as _T, FormatDict as _FormatDict
@@ -29,7 +29,7 @@ class DictAddAny(_BaseNode):
 	_schema = _io.Schema(
 		node_id=f'DictAddAny{_pack_id}',
 		display_name='Add ANY to Dict',
-		category=_category_dict,
+		category=_category,
 		description=_format_docstring(_cleandoc(__doc__)),
 		inputs=[
 			_io.String.Input(
@@ -71,7 +71,7 @@ class DictAddString(_BaseNode):
 	_schema = _io.Schema(
 		node_id=f'DictAddString{_pack_id}',
 		display_name='Add String to Dict',
-		category=_category_dict,
+		category=_category,
 		description=_format_docstring(_cleandoc(__doc__)),
 		inputs=[
 			_io.String.Input(
@@ -123,7 +123,7 @@ class DictExtractString(_BaseNode):
 	_schema = _io.Schema(
 		node_id=f'DictExtractString{_pack_id}',
 		display_name='Extract String from Dict',
-		category=_category_dict,
+		category=_category,
 		description=_format_docstring(_cleandoc(__doc__)),
 		inputs=[
 			_io.Boolean.Input(

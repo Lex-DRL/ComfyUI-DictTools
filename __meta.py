@@ -3,7 +3,6 @@
 Metadata-related module.
 """
 
-category: str = "String Constructor"
-category_dict: str = f"{category}/Format-Dict"
+category: str = "🗂️ Dict Tools"
 category_old: str = f"{category}/_old"
-pack_id_suffix: str = " [String Constructor]"
+pack_id_suffix: str = " [Dict Tools]"
