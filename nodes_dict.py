@@ -12,7 +12,7 @@ from .__meta import (
 	pack_id_suffix as _pack_id
 )
 from .__typing import _A, _U, _O, _t, T as _T, DictMap as _DictMap
-from ._dict_funcs import _new_dict_with_updated_key
+from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT,
@@ -52,16 +52,16 @@ class DictAddAny(_BaseNode):
 
 	@classmethod
 	def execute(cls,
-		name: str, dict: _O[_DictMap] = None, value: _A = None
+		name: _O[str], dict: _O[_DictMap] = None, value: _A = None
 	) -> _io.NodeOutput:
 		"""Update/append an item of any type to the dict."""
-		if value is None:
+		if name is None:
 			if dict is None:
 				dict = _frozendict()
 			# No need to create another dict instance if we add nothing:
 			result = dict
 		else:
-			result = _new_dict_with_updated_key(dict, name, value)
+			result = _new_updated_dict(dict, {name: value})
 		return _io.NodeOutput(result)
 
 # ----------------------------------------------------------
@@ -113,7 +113,7 @@ class DictAddString(_BaseNode):
 			string = '\n'.join(
 				x.strip() for x in string.splitlines()
 			)
-		result= _new_dict_with_updated_key(dict, name, string)
+		result= _new_updated_dict(dict, {name: string})
 		return _io.NodeOutput(result)
 
 # ----------------------------------------------------------

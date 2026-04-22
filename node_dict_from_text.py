@@ -3,6 +3,8 @@
 
 from inspect import cleandoc as _cleandoc
 
+from frozendict import frozendict as _frozendict
+
 from comfy_api.latest import io as _io, ui as _ui
 
 from .__meta import (
@@ -17,8 +19,6 @@ from ._io_custom import (
 	_input_override, _schema_old_name
 )
 from .docstring_formatter import format_docstring as _format_docstring
-
-_dict = dict
 
 # ----------------------------------------------------------
 
@@ -120,8 +120,8 @@ class DictFromText(_BaseNode):
 
 		if not new_dict:
 			# No need to create another dict instance if we add nothing:
-			out_dict = _dict() if dict is None else dict
-			out_ui = '' if show_status else None
+			out_dict = _frozendict() if dict is None else dict
+			out_ui = _ui.PreviewText('') if show_status else None
 			return _io.NodeOutput(out_dict, ui=out_ui)
 
 		out_dict = _new_updated_dict(dict, new_dict)
