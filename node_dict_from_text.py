@@ -9,7 +9,7 @@ from .__meta import (
 	category as _category,
 	pack_id_suffix as _pack_id
 )
-from .__typing import _A, _U, _O, _t, T as _T, FormatDict as _FormatDict
+from .__typing import _A, _U, _O, _t, T as _T, DictMap as _DictMap
 from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
@@ -113,7 +113,7 @@ class DictFromText(_BaseNode):
 	@classmethod
 	def execute(cls,
 		cleanup: bool, dict_text: str, show_status: bool = False,
-		dict: _O[_FormatDict] = None
+		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
 		parsed_items = _parsed_kv_pairs_gen(dict_text, strip_lines=cleanup)
 		new_dict = {k: v for k, v in parsed_items}
@@ -151,7 +151,7 @@ class DictFromTextOld1(_BaseNode):
 	@classmethod
 	def execute(cls,
 		cleanup: bool, strings: str, show_status: bool = False,
-		dict: _O[_FormatDict] = None
+		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
 		return DictFromText.execute(
 			cleanup=cleanup, dict_text=strings, show_status=show_status,

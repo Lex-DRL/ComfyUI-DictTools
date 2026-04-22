@@ -3,13 +3,11 @@
 Shared code to deal with dicts.
 """
 
-import typing as _t
-
 import re as _re
 
 from frozendict import deepfreeze as _deepfreeze, frozendict as _frozendict
 
-from .__typing import T as _T, T2 as _T2
+from .__typing import _t, _A, _O, _U, T as _T, T2 as _T2, DictMap as _DictMap
 
 
 _re_valid_key_match = _re.compile("[a-zA-Z_][a-zA-Z_0-9]*$").match
@@ -49,7 +47,7 @@ def _raise_from_errors_dict(
 	raise KeyError(msg)
 
 
-def _verify_input_dict(input_dict: _t.Dict[str, _T] = None, error_if_none=False):
+def _verify_input_dict(input_dict: _DictMap = None, error_if_none=False):
 	"""
 	Verify input dict to have only valid keys. Raises errors if invalid ones found.
 	"""
@@ -73,7 +71,7 @@ def _verify_input_dict(input_dict: _t.Dict[str, _T] = None, error_if_none=False)
 	)
 
 
-def _verify_input_dict_into_new(input_dict: _t.Dict[str, _T] = None) -> _t.Dict[str, _T]:
+def _verify_input_dict_into_new(input_dict: _DictMap = None) -> _DictMap:
 	"""
 	Verify input dict to have only valid keys. Raises errors if invalid ones found.
 	Always returns a new dict instance (shallow copy if non-empty dict passed).
@@ -85,11 +83,11 @@ def _verify_input_dict_into_new(input_dict: _t.Dict[str, _T] = None) -> _t.Dict[
 
 
 def _new_updated_dict(
-	input_dict: _t.Union[_t.Dict[str, _T], None], *updating_dicts: _t.Dict[str, _T2],
+	input_dict: _O[_DictMap], *updating_dicts: _DictMap,
 	sort=True, frozen=True, validate_new_keys=True
-) -> _t.Dict[str, _t.Union[_T, _T2]]:
+) -> _DictMap:
 	"""Return a new dict being a union of the input one and the new (updating) ones."""
-	out_dict: _t.Dict[str, _t.Union[_T, _T2]] = _verify_input_dict_into_new(input_dict)
+	out_dict = _verify_input_dict_into_new(input_dict)
 
 	if validate_new_keys:
 		errors_dict: _t.Dict[_t.Any, str] = dict()
@@ -111,8 +109,8 @@ def _new_updated_dict(
 
 
 def _new_dict_with_updated_key(
-	input_dict: _t.Union[_t.Dict[str, _T], None], key: str, value: _T2, sort=True, frozen=True, validate_key=True
-) -> _t.Dict[str, _t.Union[_T, _T2]]:
+	input_dict: _O[_DictMap], key: _A, value: _A, sort=True, frozen=True, validate_key=True
+) -> _DictMap:
 	"""Return a new dict being a union of the input one and the new (updating) key/value."""
 	return _new_updated_dict(
 		input_dict, {key: value}, sort=sort, frozen=frozen, validate_new_keys=validate_key
