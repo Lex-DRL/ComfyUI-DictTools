@@ -3,13 +3,15 @@
 
 from inspect import cleandoc as _cleandoc
 
+from frozendict import frozendict as _frozendict
+
 from comfy_api.latest import io as _io, ui as _ui
 
 from .__meta import (
 	category as _category,
 	pack_id_suffix as _pack_id
 )
-from .__typing import _A, _U, _O, _t, T as _T, FormatDict as _FormatDict
+from .__typing import _A, _U, _O, _t, T as _T, DictMap as _DictMap
 from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
@@ -17,8 +19,6 @@ from ._io_custom import (
 	_input_override, _schema_old_name
 )
 from .docstring_formatter import format_docstring as _format_docstring
-
-_dict = dict
 
 # ----------------------------------------------------------
 
@@ -113,15 +113,15 @@ class DictFromText(_BaseNode):
 	@classmethod
 	def execute(cls,
 		cleanup: bool, dict_text: str, show_status: bool = False,
-		dict: _O[_FormatDict] = None
+		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
 		parsed_items = _parsed_kv_pairs_gen(dict_text, strip_lines=cleanup)
 		new_dict = {k: v for k, v in parsed_items}
 
 		if not new_dict:
 			# No need to create another dict instance if we add nothing:
-			out_dict = _dict() if dict is None else dict
-			out_ui = '' if show_status else None
+			out_dict = _frozendict() if dict is None else dict
+			out_ui = _ui.PreviewText('') if show_status else None
 			return _io.NodeOutput(out_dict, ui=out_ui)
 
 		out_dict = _new_updated_dict(dict, new_dict)
@@ -151,7 +151,7 @@ class DictFromTextOld1(_BaseNode):
 	@classmethod
 	def execute(cls,
 		cleanup: bool, strings: str, show_status: bool = False,
-		dict: _O[_FormatDict] = None
+		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
 		return DictFromText.execute(
 			cleanup=cleanup, dict_text=strings, show_status=show_status,
