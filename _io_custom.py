@@ -20,6 +20,10 @@ _DICT_OUTPUT = _DICT.Output(
 	'DICT',
 	display_name='dict'
 )
+_KEY_INPUT_ADD = _io.String.Input(
+	'name',
+	tooltip="Name (key) of the item inserted into the dict.",
+)
 
 _T_Input = _t.TypeVar('T_Input', bound=_io.Input)
 

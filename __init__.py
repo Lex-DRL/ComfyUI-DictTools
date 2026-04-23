@@ -6,6 +6,7 @@ from comfy_api.latest import ComfyExtension as _ComfyExtension, io as _io
 
 from .node_dict_from_text import *
 from .nodes_add import *
+from .nodes_extract import *
 
 class DictToolsExtension(_ComfyExtension):
 	async def get_node_list(self) -> list[type[_io.ComfyNode]]:
