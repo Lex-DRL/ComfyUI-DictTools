@@ -16,7 +16,7 @@ from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT,
-	_input_override, _schema_old_name
+	_InputsConverter, _schema_old_node
 )
 from .docstring_formatter import format_docstring as _format_docstring
 
@@ -139,13 +139,13 @@ class DictFromText(_BaseNode):
 
 class DictFromTextOld1(_BaseNode):
 	# noinspection PyProtectedMember
-	_schema = _schema_old_name(
+	_schema = _schema_old_node(
 		DictFromText._schema,
 		'StringConstructorDictFromText',
-		inputs=[
-			_input_override(x, id='strings') if x.id == 'dict_text' else x
-			for x in DictFromText._schema.inputs
-		],
+		inputs_converter=_InputsConverter(
+			preserved=('cleanup', 'dict_text', 'show_status', 'dict'),
+			renames={'dict_text': 'strings'},
+		),
 	)
 
 	@classmethod

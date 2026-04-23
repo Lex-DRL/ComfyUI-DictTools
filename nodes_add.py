@@ -16,7 +16,7 @@ from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT, _KEY_INPUT_ADD,
-	_schema_old_name
+	_InputsConverter, _schema_old_node
 )
 from .docstring_formatter import format_docstring as _format_docstring
 
@@ -32,28 +32,28 @@ class DictAddAny(_BaseNode):
 		inputs=[
 			_KEY_INPUT_ADD,
 
-			_DICT_INPUT_OPTIONAL,
 			_io.AnyType.Input(
 				'value',
 				optional=True,
 				tooltip="The actual any-type item to add into the dict."
 			),
+			_DICT_INPUT_OPTIONAL,
 		],
 		outputs=[_DICT_OUTPUT],
 	)
 
 	@classmethod
 	def execute(cls,
-		name: _O[str], dict: _O[_DictMap] = None, value: _A = None
+		key: _O[str], value: _A = None, dict: _O[_DictMap] = None,
 	) -> _io.NodeOutput:
 		"""Update/append an item of any type to the dict."""
-		if name is None:
+		if key is None:
 			if dict is None:
 				dict = _frozendict()
 			# No need to create another dict instance if we add nothing:
 			result = dict
 		else:
-			result = _new_updated_dict(dict, {name: value})
+			result = _new_updated_dict(dict, {key: value})
 		return _io.NodeOutput(result)
 
 # ----------------------------------------------------------
@@ -68,7 +68,7 @@ class DictAddString(_BaseNode):
 		inputs=[
 			_KEY_INPUT_ADD,
 			_io.Boolean.Input(
-				'cleanup',
+				'cleanup_value',
 				tooltip=(
 					"When enabled, each line in the sub-string is stripped "
 					"from any spaces at its start and end."
@@ -78,7 +78,7 @@ class DictAddString(_BaseNode):
 				label_off='no',
 			),
 			_io.String.Input(
-				'string',
+				'value',
 				tooltip="The actual string to add into the dict.",
 				multiline=True,
 			),
@@ -90,16 +90,16 @@ class DictAddString(_BaseNode):
 
 	@classmethod
 	def execute(cls,
-		name: str, cleanup: bool, string: str,
+		key: str, cleanup_value: bool, value: str = None,
 		dict: _O[_DictMap] = None,
 	) -> _io.NodeOutput:
 		"""Update/append a string to the dict."""
-		string = '' if string is None else str(string)
-		if cleanup:
-			string = '\n'.join(
-				x.strip() for x in string.splitlines()
+		value = '' if value is None else str(value)
+		if cleanup_value:
+			value = '\n'.join(
+				x.strip() for x in value.splitlines()
 			)
-		result= _new_updated_dict(dict, {name: string})
+		result= _new_updated_dict(dict, {key: value})
 		return _io.NodeOutput(result)
 
 
@@ -107,15 +107,44 @@ class DictAddString(_BaseNode):
 # Deprecated nodes with old IDs (for backwards compatibility)
 
 
-class DictAddAnyOld1(DictAddAny):
-	_schema = _schema_old_name(
+class DictAddAnyOld1(_BaseNode):
+	# noinspection PyProtectedMember
+	_schema = _schema_old_node(
 		DictAddAny._schema,
-		'StringConstructorDictAddAny'
+		'StringConstructorDictAddAny',
+		inputs_converter=_InputsConverter(
+			preserved=('key', 'dict', 'value'),
+			renames={'key': 'name'},
+		),
 	)
 
+	@classmethod
+	def execute(cls,
+		name: _O[str], dict: _O[_DictMap] = None, value: _A = None
+	) -> _io.NodeOutput:
+		return DictAddAny.execute(key=name, dict=dict, value=value)
 
-class DictAddStringOld1(DictAddString):
-	_schema = _schema_old_name(
+
+class DictAddStringOld1(_BaseNode):
+	# noinspection PyProtectedMember
+	_schema = _schema_old_node(
 		DictAddString._schema,
-		'StringConstructorDictAddString'
+		'StringConstructorDictAddString',
+		inputs_converter=_InputsConverter(
+			preserved=('key', 'cleanup_value', 'value', 'dict'),
+			renames={
+				'key': 'name',
+				'cleanup_value': 'cleanup',
+				'value': 'string',
+			},
+		),
 	)
+
+	@classmethod
+	def execute(cls,
+		name: str, cleanup: bool, string: str,
+		dict: _O[_DictMap] = None,
+	) -> _io.NodeOutput:
+		return DictAddString.execute(
+			key=name, cleanup_value=cleanup, value=string, dict=dict
+		)

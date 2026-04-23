@@ -13,7 +13,7 @@ from .__typing import _A, _U, _O, _t, T as _T, DictMap as _DictMap
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL,
-	_input_override, _schema_old_name
+	_InputsConverter, _schema_old_node
 )
 from .docstring_formatter import format_docstring as _format_docstring
 
@@ -98,14 +98,13 @@ class DictExtractString(_BaseNode):
 
 class DictExtractStringOld1(_BaseNode):
 	# noinspection PyProtectedMember
-	_schema = _schema_old_name(
+	_schema = _schema_old_node(
 		DictExtractString._schema,
 		'StringConstructorDictExtractString',
-		inputs=[
-			_input_override(x, id='name') if x.id == 'key' else x
-			for x in DictExtractString._schema.inputs
-			if x.id != 'cleanup_key'
-		],
+		inputs_converter=_InputsConverter(
+			preserved=('key', 'show_status', 'dict'),
+			renames={'key': 'name'},
+		),
 	)
 
 	@classmethod
