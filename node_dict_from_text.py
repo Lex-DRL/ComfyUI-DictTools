@@ -16,21 +16,23 @@ from ._dict_funcs import _new_updated_dict
 from ._io_custom import (
 	_BaseNode,
 	_DICT_INPUT_OPTIONAL, _DICT_OUTPUT,
-	_input_override, _schema_old_name
+	_InputsConverter, _schema_old_node
 )
 from .docstring_formatter import format_docstring as _format_docstring
 
 # ----------------------------------------------------------
 
-def _return_line_raw(line_raw: str, line_stripped:str) -> str:
+def __return_line_raw(line_raw: str, line_stripped:str) -> str:
 	return line_raw
 
 
-def _return_line_stripped(line_raw: str, line_stripped:str) -> str:
+def __return_line_stripped(line_raw: str, line_stripped:str) -> str:
 	return line_stripped
 
 
-def _parsed_kv_pairs_gen(multiline_str: str, strip_lines=True):
+def _parsed_kv_pairs_gen(
+	multiline_str: _O[str], pre_strip_lines=True
+) -> _t.Generator[_t.Tuple[str, str], _A, None]:
 	"""Parse the "dict text" into sequence of key-value pairs:
 	Given a multiline string, extract keywords (first non-empty line in each chunk)
 	and their substrings (all the following non-empty lines).
@@ -38,23 +40,34 @@ def _parsed_kv_pairs_gen(multiline_str: str, strip_lines=True):
 	if not multiline_str:
 		return
 	multiline_str = str(multiline_str)
-	if not multiline_str.strip():
+
+	choose_appended_line = __return_line_raw
+	if pre_strip_lines:
+		multiline_str = multiline_str.strip()
+		choose_appended_line = __return_line_stripped
+
+	if not multiline_str:
 		return
 
-	appended_line_f = _return_line_stripped if strip_lines else _return_line_raw
 	cur_chunk: _t.List[str] = list()
 
 	def dump_chunk():
 		cur_chunk_iter = iter(cur_chunk)  # It's more backwards-compatible than `a, *b = x`
-		chunk_key = next(cur_chunk_iter)
+		chunk_key = next(cur_chunk_iter)  # Might have just whitespaces when no strip
 		cur_chunk_lines = list(cur_chunk_iter)
 		# If there are no actual lines, join() would return an empty string:
-		return chunk_key.strip(), '\n'.join(cur_chunk_lines)
+		return chunk_key, '\n'.join(cur_chunk_lines)
 
 	for line in multiline_str.splitlines():
 		line_stripped: str = line.strip()
-		if line_stripped:
-			cur_chunk.append(appended_line_f(line, line_stripped))
+		line = choose_appended_line(line, line_stripped)
+		if (
+			line_stripped
+			# Even if we don't strip,
+			# whitespace-only lines are included only for keys:
+			or (line and not cur_chunk)
+		):
+			cur_chunk.append(line)
 			continue
 
 		assert not line_stripped
@@ -62,7 +75,7 @@ def _parsed_kv_pairs_gen(multiline_str: str, strip_lines=True):
 			yield dump_chunk()
 			cur_chunk = list()
 
-		# We simply skip all the empty lines entirely
+		# We simply skip all the empty lines between blocks
 
 	if cur_chunk:
 		yield dump_chunk()
@@ -80,8 +93,8 @@ class DictFromText(_BaseNode):
 		description=_format_docstring(_cleandoc(__doc__)),
 		inputs=[
 			_io.Boolean.Input(
-				'cleanup',
-				tooltip="When enabled, each line in each sub-string is stripped from any spaces at its start and end.",
+				'pre_cleanup', display_name='cleanup',
+				tooltip="When enabled, each line is stripped from any leading/trailing spaces before parsing the text.",
 				default=True,
 				label_on='leading/trailing spaces',
 				label_off='no',
@@ -112,10 +125,11 @@ class DictFromText(_BaseNode):
 
 	@classmethod
 	def execute(cls,
-		cleanup: bool, dict_text: str, show_status: bool = False,
+		pre_cleanup: bool,
+		dict_text: str = None, show_status: bool = False,
 		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
-		parsed_items = _parsed_kv_pairs_gen(dict_text, strip_lines=cleanup)
+		parsed_items = _parsed_kv_pairs_gen(dict_text, pre_strip_lines=pre_cleanup)
 		new_dict = {k: v for k, v in parsed_items}
 
 		if not new_dict:
@@ -139,13 +153,16 @@ class DictFromText(_BaseNode):
 
 class DictFromTextOld1(_BaseNode):
 	# noinspection PyProtectedMember
-	_schema = _schema_old_name(
+	_schema = _schema_old_node(
 		DictFromText._schema,
 		'StringConstructorDictFromText',
-		inputs=[
-			_input_override(x, id='strings') if x.id == 'dict_text' else x
-			for x in DictFromText._schema.inputs
-		],
+		inputs_converter=_InputsConverter(
+			preserved=('pre_cleanup', 'dict_text', 'show_status', 'dict'),
+			renames={
+				'pre_cleanup': 'cleanup',
+				'dict_text': 'strings',
+			},
+		),
 	)
 
 	@classmethod
@@ -154,6 +171,6 @@ class DictFromTextOld1(_BaseNode):
 		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
 		return DictFromText.execute(
-			cleanup=cleanup, dict_text=strings, show_status=show_status,
+			pre_cleanup=cleanup, dict_text=strings, show_status=show_status,
 			dict=dict
 		)
