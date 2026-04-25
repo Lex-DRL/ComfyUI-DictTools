@@ -7,7 +7,10 @@ from dataclasses import dataclass as _dataclass, fields as __dataclass_fields
 from comfy_api.latest import io as _io
 
 from .__meta import category_old as _category_old
-from .__typing import _t, T as _T, _A, _O, _U, _TypeVar
+from .__typing import (
+	_t, _A, _C, _O, _U, _TypeVar,
+	T as _T, T_ComfyNode as _T_ComfyNode
+)
 
 
 _DICT = _io.Custom("DICT")
@@ -16,13 +19,30 @@ _DICT_INPUT_OPTIONAL = _DICT.Input(
 	optional=True,
 	tooltip="An (optional) Dictionary to work with."
 )
+_DICT_INPUT_REQUIRED = _DICT.Input(
+	'dict',
+	tooltip="A Dictionary to work with."
+)
 _DICT_OUTPUT = _DICT.Output(
 	'DICT',
 	display_name='dict'
 )
+_KEY_CLEANUP_INPUT = _io.Boolean.Input(
+	'cleanup_key', display_name='clean key',
+	tooltip=(
+		"Automatically remove leading/trailing spaces and extra newlines from the key."
+	),
+	default=True,
+	label_on='strip spaces',
+	label_off='no',
+)
 _KEY_INPUT_ADD = _io.String.Input(
 	'key',
 	tooltip="Key (name) of the item inserted into the dict.",
+)
+_KEY_INPUT_EXTRACT = _io.String.Input(
+	'key',
+	tooltip="Key (name) of the item extracted from the dict.",
 )
 
 _T_Input = _t.TypeVar('T_Input', bound=_io.Input)
@@ -142,3 +162,40 @@ class _BaseNode(_io.ComfyNode):
 
 
 _T_BaseNode = _TypeVar('T_BaseNode', bound=_BaseNode)
+
+
+def _attach_execute_method(cls: _t.Type[_T_ComfyNode], execute: _C, docstring: str = None) -> _t.Type[_T_ComfyNode]:
+	"""Attach a function as ``execute`` method override."""
+	if not docstring:
+		try:
+			docstring = execute.__doc__
+		except AttributeError:
+			docstring = None
+	if not docstring:
+		try:
+			docstring = cls.execute.__doc__
+		except AttributeError:
+			docstring = None
+	if docstring:
+		execute.__doc__ = docstring
+
+	# Mimic the func's metadata to make it look as if it was
+	# actually defined as an in-class method:
+	execute.__module__ = cls.__module__
+	execute.__name__ = 'execute'
+	execute.__qualname__ = f"{cls.__qualname__}.execute"
+
+	# Make it a class method (has to be done after this ^)
+	# and attach to the class:
+	cls.execute = classmethod(execute)
+
+	# Since any decorator works after ABCMeta has done its job,
+	# and `execute` might be previously missing (kept as abstract method),
+	# we need to manually exclude it:
+	if getattr(cls, "__abstractmethods__", None):
+		cls.__abstractmethods__ = frozenset(
+			name for name in cls.__abstractmethods__
+			if name != 'execute'
+		)
+
+	return cls

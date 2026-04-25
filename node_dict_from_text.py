@@ -82,27 +82,34 @@ def _parsed_kv_pairs_gen(
 
 # ----------------------------------------------------------
 
-class DictFromText(_BaseNode):
-	"""
-	Build a dict of named sub-strings to be used later in string formatting (text construction).
-	"""
+class TextToDict(_BaseNode):
+	"""Parse raw text into key-value pairs."""
 	_schema = _io.Schema(
-		node_id=f'DictFromText{_pack_id}',
-		display_name='Dict from Text',
+		node_id=f'TextToDict{_pack_id}',
+		display_name='📃Text → Dict🗂️',
 		category=_category,
 		description=_format_docstring(_cleandoc(__doc__)),
 		inputs=[
 			_io.Boolean.Input(
 				'pre_cleanup', display_name='cleanup',
-				tooltip="When enabled, each line is stripped from any leading/trailing spaces before parsing the text.",
+				tooltip=(
+					"When enabled, each line is individually pre-stripped "
+					"of any leading/trailing spaces before parsing the text."
+				),
 				default=True,
-				label_on='leading/trailing spaces',
+				label_on='strip spaces',
 				label_off='no',
 			),
 			_io.String.Input(
 				'dict_text', display_name='dict-items text',
 				tooltip=(
-					"Sub-string names followed by their text. Different sub-string chunks are separated by empty lines. Example:\n\n"
+					"A wall of key-value pairs:\n"
+					"• keys (item names) on their own line,\n"
+					"• followed by their text.\n\n"
+					"Different items are separated by empty lines."
+				),
+				placeholder=(
+					"Example:\n\n"
 					"char1_short\n1boy, blond, short hair\n\n"
 					"char1_long\n1boy, smiling, blue eyes, blond, short hair,\nwearing a leather jacket, sitting on a bike"
 				),
@@ -125,10 +132,11 @@ class DictFromText(_BaseNode):
 
 	@classmethod
 	def execute(cls,
-		pre_cleanup: bool,
-		dict_text: str = None, show_status: bool = False,
+		pre_cleanup: bool, dict_text: _O[str],
+		show_status: bool = False,
 		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
+		"""Parse raw text into key-value pairs."""
 		parsed_items = _parsed_kv_pairs_gen(dict_text, pre_strip_lines=pre_cleanup)
 		new_dict = {k: v for k, v in parsed_items}
 
@@ -151,10 +159,10 @@ class DictFromText(_BaseNode):
 # ==========================================================
 # Deprecated node with old ID (for backwards compatibility)
 
-class DictFromTextOld1(_BaseNode):
+class TextToDictOld1(_BaseNode):
 	# noinspection PyProtectedMember
 	_schema = _schema_old_node(
-		DictFromText._schema,
+		TextToDict._schema,
 		'StringConstructorDictFromText',
 		inputs_converter=_InputsConverter(
 			preserved=('pre_cleanup', 'dict_text', 'show_status', 'dict'),
@@ -170,7 +178,13 @@ class DictFromTextOld1(_BaseNode):
 		cleanup: bool, strings: str, show_status: bool = False,
 		dict: _O[_DictMap] = None
 	) -> _io.NodeOutput:
-		return DictFromText.execute(
+		return TextToDict.execute(
 			pre_cleanup=cleanup, dict_text=strings, show_status=show_status,
 			dict=dict
 		)
+
+class TextToDictOld2(TextToDict):
+	_schema = _schema_old_node(
+		TextToDict._schema,
+		f'DictFromText{_pack_id}',
+	)
