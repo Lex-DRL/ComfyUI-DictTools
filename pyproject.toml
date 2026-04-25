@@ -1,6 +1,6 @@
 [project]
 name = "dict_tools"
-version = "3.2.0"
+version = "3.2.1"
 description = "Essential nodes to use dictionaries in ComfyUI: for smart prompt-formatting, general organization (passing a single connection instead of spaghetti), or anything else."
 license = {file = "LICENSE.md"}
 readme = "README.md"

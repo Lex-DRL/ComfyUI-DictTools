@@ -310,6 +310,44 @@ class DictAddAny(_BaseNode):
 # ----------------------------------------------------------
 
 
+class DictAddAnyKey(_BaseNode):
+	"""Add/update any-type item with any-type key to a Dict."""
+	_schema = _io.Schema(
+		node_id=f'DictAddAnyKey{_pack_id}',
+		display_name='◯ANY-Key◯ → Dict🗂️',
+		category=_category_add,
+		description=_format_docstring(_cleandoc(__doc__)),
+		inputs=[
+			_DICT_INPUT_OPTIONAL,
+			_io.AnyType.Input(
+				'key',
+				optional=True,
+				tooltip="Key (of ANY type) for the item inserted into the dict.",
+			),
+			_io.AnyType.Input(
+				'value',
+				optional=True,
+				tooltip="The actual any-type item to add into the Dict."
+			),
+		],
+		outputs=[_DICT_OUTPUT],
+	)
+
+	# noinspection PyShadowingBuiltins
+	@classmethod
+	def execute(cls,
+		key: _A = None, value: _A = None,
+		dict: _O[_DictMap] = None,
+	) -> _io.NodeOutput:
+		"""Add/update any-type item with any-type key to a Dict."""
+		# No type check: neither for the key, nor for value
+		result = _new_updated_dict(dict, {key: value})
+		return _io.NodeOutput(result)
+
+
+# ----------------------------------------------------------
+
+
 class DictAddString(_BaseNode):
 	"""Add/update a string item to a Dict."""
 	_schema = _io.Schema(

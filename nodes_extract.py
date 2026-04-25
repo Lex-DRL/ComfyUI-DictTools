@@ -291,6 +291,49 @@ class DictExtractAny(_BaseNode):
 		return _io.NodeOutput(value)
 
 
+# ----------------------------------------------------------
+
+
+class DictExtractAnyKey(_BaseNode):
+	"""Extract any-type item with any-type key from a Dict."""
+	_schema = _io.Schema(
+		node_id=f'DictExtractAnyKey{_pack_id}',
+		display_name='🗂️Dict → ◯ANY-Key◯',
+		category=_category_extract,
+		description=_format_docstring(_cleandoc(__doc__)),
+		inputs=[
+			_DICT_INPUT_REQUIRED,
+			_io.AnyType.Input(
+				'key',
+				optional=True,
+				tooltip="Key (of ANY type) for the item extracted from the dict.",
+			),
+		],
+		outputs=[
+			_io.AnyType.Output(
+				'value',
+				tooltip="The actual any-type item extracted from the Dict."
+			),
+		],
+		# hidden=[_io.Hidden.unique_id],
+	)
+
+	# noinspection PyShadowingBuiltins
+	@classmethod
+	def execute(cls,
+		dict: _DictMap, key: _A = None,
+	) -> _io.NodeOutput:
+		"""Extract any-type item with any-type key from a Dict."""
+		dict = _validate_required_dict(dict)
+		# No key-check
+		value = _get_key(dict, key)
+		# No output-type check
+		return _io.NodeOutput(value)
+
+
+# ----------------------------------------------------------
+
+
 class DictExtractString(_BaseNode):
 	"""Extract a string item from a Dict."""
 	_schema = _io.Schema(
